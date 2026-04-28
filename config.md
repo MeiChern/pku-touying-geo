@@ -1,32 +1,43 @@
-## 基础信息
+# Deck Config
 
-- 标题：`touying.ethan`
-- 副标题：无
-- 作者：`Ethan`
-- 单位：`Peking University`
-- 日期：`2026-04-23`
+## Setup
 
-## 目录结构
+- Language: EN
+- Venue: PKU/internal
+- Objective: conference-style geoscience academic report
+- Density: normal
+- Domain: geoscience
 
-1. 模板概览
-2. 快速上手
-3. 常见修改入口
-4. 构建导出与协作
+## Metadata
 
-## 页面重点
+- Title: General Geoscience Academic Report
+- Subtitle: Spec-driven Touying setup with PKU-aware identity
+- Author: Researcher Name
+- Institution: Peking University
+- Date: 2026-04-26
 
-- 说明项目是什么、适合什么场景、内置了哪些页面类型。
-- 说明仓库目录结构和常见文件职责。
-- 说明用户如何从修改封面信息开始，逐步替换目录、正文和图片。
-- 说明如何执行 `typst compile main.typ` 导出 PDF。
-- 说明 `task.md`、`config.md` 与 `ulw` 模式的推荐协作方式。
+## Sections
 
-## 图片要求
+1. Background
+2. Study Area & Data
+3. Method
+4. Results
+5. Discussion
+6. Conclusions
 
-- 尽量带图片。
-- 优先复用仓库已有素材作为示意图。
+## Assets
 
-## 页面保留项
+- Lab logo: `figures/lab-logo/Natural_Hazards_Remote_Sensing_Lab_logo_nhrs_lab_transparent.png`
+- Study area map: `figures/background.png`
+- Method figure: `figures/background.png`
+- Result figure: `figures/background.png`
 
-- 保留参考文献页。
-- 保留结束页。
+The lab logo is a PKU CUES affiliated identity asset. The figure paths are placeholder assets for the scaffold. Replace them with real maps, field photos, remote-sensing products, model diagrams, and result figures for actual talks.
+
+## Notes For AI
+
+- Use `lib/geo-presentation.typ` as the public import.
+- Prefer semantic components like `geo-study-area-page` and `geo-result-page`.
+- Keep PKU branding restrained.
+- Preserve compile checks.
+- Do not create separate full templates for every language/venue/objective combination.

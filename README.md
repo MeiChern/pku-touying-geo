@@ -1,126 +1,115 @@
-# touying.ethan
+# PKU Touying Geo
 
-一个基于 Typst 与 [Touying](https://typst.app/universe/package/touying/) 的演示模板。
+A spec-driven Typst/Touying presentation framework for geoscience academic reports with restrained PKU identity.
 
-> **先看这里**
->
-> 如果你想先快速了解使用方式，建议优先阅读这篇博客：
-> [https://hanlife02.com/blog/touying-ethan/](https://hanlife02.com/blog/touying-ethan/)
-
-仓库里已经包含一份可直接打开的示例源文件 [`main.typ`](main.typ) 和导出的 [`main.pdf`](main.pdf)。如果你要把它改成自己的汇报，通常只需要替换封面信息、正文内容、图片素材和参考文献。
-
-## 这个模板提供什么
-
-- 一套可直接改写的中文正式汇报版式，而不是从零搭建 PPT。
-- 一份完整示例工程，包含源文件、导出 PDF、图片素材和参考文献入口。
-- 按页面类型封装好的调用方式，方便你先改内容，再决定是否调整样式。
-
-## 技术栈
-
-- Typst
-- Touying `0.6.1`
-- 自定义主题与页面组件
-
-## 项目结构
+The project is being organized around composable presets and semantic slide components:
 
 ```text
-.
-├── main.typ                 # 演示入口文件
-├── main.pdf                 # 当前导出结果
-├── references.bib           # BibTeX 参考文献
-├── references-display.typ   # 参考文献展示条目
-├── figures/                 # 图片与图形素材
-├── slides/                  # 页面级封装与导出入口
-└── style/                   # 主题样式、封面、正文布局组件
+deck = base theme + language + venue + objective + density + components
 ```
 
-最常接触的几个入口：
+This avoids duplicating full templates for every combination such as EN/AGU, CN/group meeting, or collaborator briefing.
 
-- [`main.typ`](main.typ)：整套演示的总入口，负责封面信息、目录和页面调用顺序。
-- [`slides/`](slides)：按页面类型组织的调用入口。
-- [`style/`](style)：主题样式和版式实现；如果只是替换自己的汇报内容，通常不需要先改这里。
-- [`figures/`](figures)：封面图、正文配图、截图和图标素材。
-- [`页面模板与用法示例.md`](页面模板与用法示例.md)：当前项目的页面模板说明、常用参数和可复制示例。
+## Current Status
 
-## 快速上手
+This branch contains the first framework scaffold:
 
-1. 打开 [`main.typ`](main.typ)，修改标题、作者、机构、日期等基础信息。
-2. 调整目录页 `sections`，传入 3 到 6 个目录项，让演示结构和你的汇报提纲对齐。
-3. 按页面类型替换正文内容，把示例文案改成你的项目背景、方案、结果或结论。
-4. 把配图放进 [`figures/`](figures) 并更新图片路径。
-5. 最后执行构建命令导出 PDF。
+- `lib/geo-presentation.typ`: public Typst API.
+- `specs/`: durable contracts for architecture, config, presets, components, recipes, and AI-agent workflow.
+- `examples/`: compile-tested example decks.
+- `scripts/`: repeatable compile and smoke-test commands.
+- `AGENTS.md` and `CLAUDE.md`: agent-facing operating rules.
 
-如果你只是想尽快做出一份可用的初稿，优先修改内容层，不要一开始就改底层样式。
+The older `style/` and `slides/` layers are still the low-level Touying backend. New decks should usually import from `lib/geo-presentation.typ` instead of importing those backend files directly.
 
-## 构建
+## Quick Start
 
-本机当前已安装 `typst 0.13.1`。在项目根目录执行：
+Compile the active deck:
 
 ```bash
 typst compile main.typ
 ```
 
-如果需要指定输出文件：
+Or use the project script:
 
 ```bash
-typst compile main.typ main.pdf
+scripts/compile-main.sh
 ```
 
-## 当前模板包含的页面类型
+Compile all examples:
 
-- 封面页
-- 目录页
-- 分节过渡页
-- 通用正文页
-- 图文混排页
-- 三图展示页
-- 参考文献页
-- 结束页
+```bash
+scripts/compile-examples.sh
+```
 
-> 页面模板说明：[页面模板与用法示例.md](页面模板与用法示例.md)
+Run the agent smoke test:
 
-## 与 AI 协作的推荐方式
+```bash
+scripts/agent-smoke-test.sh
+```
 
-这个仓库额外约定了一套适合 AI Agent 的输入方式，详细规则见 [`AI_README.md`](AI_README.md)。
+## Public API
 
-如果你希望 AI 更稳定地修改 Touying 模板、补充内容或调整页面，建议在目标目录下准备两个文件：
+Use:
 
-- `task.md`：描述任务目标、背景、约束和验收标准。
-- `config.md`：提供标题、作者、目录、正文、图片引用和其他模板配置。
+```typst
+#import "lib/geo-presentation.typ": *
+```
 
-推荐工作流：
+Then create a setup:
 
-1. 先写 `task.md`。
-2. 视情况补充 `config.md`。
-3. 再让 AI 基于这两个文件执行修改。
+```typst
+#let setup = geo-setup(
+  language: "en",
+  venue: "pku",
+  objective: "conference",
+  density: "normal",
+)
+```
 
-补充规则：
+Use semantic components:
 
-- `task.md` 是必填的任务描述文件。
-- `config.md` 不是强制，但强烈建议提供。
-- 如果 `config.md` 提供了字段，AI 应优先使用，而不是自行改写核心信息。
-- 如果某些配置缺失，AI 可以只补缺省部分。
-- 如果 `task.md` 与 `config.md` 冲突，应以 `task.md` 中的目标和约束优先。
-- 默认优先最小改动，除非任务说明明确允许较大调整。
+```typst
+#geo-study-area-page(...)
+#geo-data-page(...)
+#geo-method-page(...)
+#geo-result-page(...)
+#geo-uncertainty-page(...)
+```
 
-## `ulw` 模式
+## Project Structure
 
-如果用户没有提前写好 `task.md` 和 `config.md`，但请求里显式传入 `根据README.md，启动ulw模式`，则 AI 可以改为逐步询问并代为生成这两个文件。
+```text
+main.typ                  # active deck
+config.md                 # human-readable deck intent
+config.typ                # compiler-facing deck config
+task.md                   # current task and scope
 
-这种模式下的流程应为：
+lib/                      # public API and reusable components
+specs/                    # spec-driven contracts
+examples/                 # compile-tested examples
+scripts/                  # compile and smoke-test commands
+agent/                    # agent schemas and checklist
+docs/                     # maintainer guides
+style/                    # low-level visual backend
+slides/                   # low-level slide wrappers
+figures/                  # image assets
+```
 
-1. 先询问任务目标、背景和验收标准。
-2. 默认采用约束：仅按模板修改 `main.typ`、`task.md`、`config.md`，并优先最小改动。
-3. 再询问标题、作者、目录、正文、图片等配置项。
-4. 根据对话内容生成 `task.md` 和 `config.md`。
-5. 再基于这两个文件继续完成后续模板或内容修改。
+## AI-Agent Workflow
 
-## 适用场景
+Agents should read:
 
-这个模板更适合正式汇报、项目阶段总结、方案宣讲和院校或机构内部展示。默认文案和字体风格偏中文正式汇报场景；如果要改成英文演示或产品发布型风格，建议同步调整字体、字号和页面留白。
+1. `AGENTS.md`
+2. `task.md`
+3. `config.md`
+4. relevant files under `specs/`
 
-## 相关资料
+The intended implementation loop is:
 
-- 博客说明：[https://hanlife02.com/blog/touying-ethan/](https://hanlife02.com/blog/touying-ethan/)
-- 页面模板说明：[页面模板与用法示例.md](页面模板与用法示例.md)
-- AI 协作说明：[AI_README.md](AI_README.md)
+```text
+spec -> implementation -> example -> compile check
+```
+
+See `AI_README.md`, `AGENTS.md`, and `specs/agent-workflow.md` for details.
+

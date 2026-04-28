@@ -1,0 +1,23 @@
+#let deck-config = (
+  language: "en",
+  venue: "pku",
+  objective: "conference",
+  density: "normal",
+  title: [General Geoscience Academic Report],
+  subtitle: [Spec-driven Touying setup with PKU-aware identity],
+  author: [Researcher Name],
+  institution: [Peking University],
+  date: [2026-04-26],
+  sections: (
+    [01 / Background],
+    [02 / Study Area & Data],
+    [03 / Method],
+    [04 / Results],
+    [05 / Discussion],
+    [06 / Conclusions],
+  ),
+  study_area_map: "figures/background.png",
+  method_figure: "figures/background.png",
+  result_figure: "figures/background.png",
+  lab_logo_horizontal: "figures/lab-logo/Natural_Hazards_Remote_Sensing_Lab_logo_nhrs_lab_transparent.png",
+)

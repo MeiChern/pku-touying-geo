@@ -1,20 +1,45 @@
-## 目标
+# Task
 
-完成一份关于 `touying.ethan` 项目的介绍型 PPT，面向模板用户，帮助他们理解这个模板的用途，并学会如何基于模板创建自己的 PPT 内容。
+## Goal
 
-## 背景
+Create the first spec-driven scaffold for a composable geoscience academic report framework with PKU-aware identity.
 
-这份演示稿用于向潜在或新上手的用户介绍本项目的定位、目录结构、常见修改入口、构建方式，以及与 AI 协作时推荐的使用流程。
+The framework should support multiple languages, venues, and objectives through presets and reusable components instead of duplicated full templates.
 
-## 约束
+## Use Case
 
-- 仅修改 `main.typ`、`task.md`、`config.md`。
-- 优先最小改动，不调整现有主题样式与页面组件实现。
-- 尽量复用仓库现有页面类型与图片素材。
-- 保留参考文献页和结束页。
+- Language: EN first, CN supported by preset contract.
+- Venue: PKU/internal first, AGU and EGU prepared as venue presets.
+- Objective: general academic conference/group reporting first.
+- Audience: geoscience researchers, PKU students, collaborators, and AI agents maintaining the deck.
+- Duration: flexible, typically 10 to 20 minutes.
 
-## 验收标准
+## Allowed Files
 
-- 演示内容围绕“项目介绍 + 模板使用教学”展开。
-- 受众为模板用户，能够从演示中理解如何开始、如何修改、如何导出。
-- 最终结果由用户人工确认是否正确。
+- `task.md`
+- `config.md`
+- `config.typ`
+- `main.typ`
+- `AGENTS.md`
+- `CLAUDE.md`
+- `AI_README.md`
+- `specs/`
+- `lib/`
+- `examples/`
+- `docs/`
+- `agent/`
+- `scripts/`
+
+## Do Not Touch
+
+- Avoid refactoring `style/` and `slides/` in this first scaffold unless compilation requires a small compatibility fix.
+
+## Acceptance Criteria
+
+- `main.typ` uses the public API from `lib/geo-presentation.typ`.
+- Specs describe the source-of-truth architecture.
+- Agent instructions exist for Codex/Claude-style tools.
+- At least one example deck imports only the public API.
+- `typst compile main.typ` succeeds.
+- `scripts/agent-smoke-test.sh` succeeds.
+

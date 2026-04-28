@@ -1,182 +1,53 @@
-# 如何给 AI Agent 提供有效信息以完成代码工作
+# AI Collaboration Guide
 
-## 给用户看
+This repository is intended to be easy for Codex, Claude Code, and similar agents to maintain.
 
-使用 AI agent 做 Touying 相关代码或内容工作时，只做两件事：
+## Core Idea
 
-1. 在目标目录下创建 `task.md`
-2. 在目标目录下创建 `config.md`
+Agents should not infer the project architecture from `main.typ` alone. The durable contract lives in `specs/`.
 
-`task.md` 用来说明你要 AI 做什么。  
-`config.md` 用来提供模板配置。  
+Use this loop:
 
-原则：
-
-- `task.md` 必填
-- `config.md` 选填但强烈建议提供
-- 如果 `config.md` 里写了内容，AI 必须优先使用
-- 如果 `config.md` 某些字段没写，AI 可以自行补全
-- 如果用户传入 `ulw`，AI 可以改为逐步询问，再代为生成 `task.md` 和 `config.md`
-
-### `task.md` 模板
-
-```md
-# 任务说明
-
-## 目标
-- 这次要做什么
-
-## 背景
-- 这份 PPT/模板用于什么场景
-- 当前存在什么问题或需求
-
-## 约束
-- 默认只修改 `main.typ`、`task.md`、`config.md`
-- 默认不要改 `slides/`、`style/`、`figures/` 等其他文件，除非用户明确提出
-- 默认优先最小改动
-
-## 验收标准
-- 什么结果算完成
+```text
+read task/config -> read spec -> implement -> update example -> compile
 ```
 
-### `config.md` 模板
+## Read Order
 
-```md
-# 演示配置
+1. `AGENTS.md`
+2. `task.md`
+3. `config.md`
+4. relevant files under `specs/`
+5. implementation files under `lib/`, `examples/`, `style/`, and `slides/`
 
-## 基础信息
-- 标题：
-- 副标题：
-- 作者：
-- 单位：
-- 日期：
+## File Roles
 
-## 目录信息
-- 目录数量：3 到 6 部分
-- 目录1：
-- 目录2：
-- 目录3：
-- 目录4（可选）：
-- 目录5（可选）：
-- 目录6（可选）：
+- `task.md`: current goal, scope, allowed files, acceptance criteria.
+- `config.md`: human-readable deck intent.
+- `config.typ`: compiler-facing deck configuration.
+- `specs/`: durable architecture and API contracts.
+- `lib/geo-presentation.typ`: public Typst API.
+- `examples/`: compile-tested usage proofs.
+- `scripts/`: repeatable validation commands.
 
-## 页面内容
-按目录数量填写 3 到 6 组。
+## Agent Rules
 
-- 第1部分主题：
-- 第1部分一句话摘要：
-- 第1部分正文要点：
+- Prefer public imports from `lib/geo-presentation.typ`.
+- Do not duplicate full templates for each language, venue, or objective.
+- Compose decks from setup presets and semantic components.
+- Do not refactor `style/` or `slides/` unless the task or spec explicitly allows it.
+- If a public API changes, update a spec and an example.
+- Run a compile check before final reporting.
 
-- 第2部分主题：
-- 第2部分一句话摘要：
-- 第2部分正文要点：
+## Common Commands
 
-- 第3部分主题：
-- 第3部分一句话摘要：
-- 第3部分正文要点：
-
-- 第4部分主题（可选）：
-- 第4部分一句话摘要（可选）：
-- 第4部分正文要点（可选）：
-
-- 第5部分主题（可选）：
-- 第5部分一句话摘要（可选）：
-- 第5部分正文要点（可选）：
-
-- 第6部分主题（可选）：
-- 第6部分一句话摘要（可选）：
-- 第6部分正文要点（可选）：
-
-## 图片引用
-- 封面图：
-- 图1：
-- 图2：
-- 图3：
-
-## 其他要求
-- 风格偏好：
-- 是否保留参考文献页：
-- 是否保留结束页：
+```bash
+scripts/compile-main.sh
+scripts/compile-examples.sh
+scripts/agent-smoke-test.sh
 ```
 
-建议：
+## Future Task Template
 
-- 信息不完整没关系，但越具体越好
-- 没提供的字段，AI 可以自行决定
-- 提供了的字段，AI 不要随意改写
+Use `agent/task.schema.md` for `task.md` and `agent/config.schema.md` for `config.md`.
 
-### `ulw` 模式
-
-如果用户没有手动创建 `task.md` 和 `config.md`，但在请求中传入 `ulw`，则允许 AI 改为逐步询问信息。
-
-此时流程变为：
-
-1. AI 先询问任务目标、背景、验收标准
-2. AI 默认采用约束：只按模板修改 `main.typ`、`task.md`、`config.md`，并优先最小改动
-3. AI 再询问标题、副标题、作者、单位、日期、目录、正文、图片等配置
-4. AI 根据对话内容生成 `task.md` 和 `config.md`
-5. AI 再基于这两个文件继续执行任务
-
-规则：
-
-- 有 `ulw` 才进入逐步询问模式
-- 没有 `ulw` 时，默认优先读取用户已写好的文件
-- 逐步询问得到的信息，最终也应整理为 `task.md` 和 `config.md`
-- 若用户没有提出额外限制，AI 不应单独追问“约束”这一项
-- 只有当用户明确说明可改范围或禁止改动内容时，才覆盖默认约束
-
-## 给 AI 看
-
-处理任务时，按下面规则执行：
-
-1. 先读取当前目录下的 `task.md`
-2. 如果存在 `config.md`，必须一并读取
-3. `task.md` 决定任务目标与约束
-4. `config.md` 决定页面内容与模板配置
-5. 若 `config.md` 提供了字段，优先使用用户提供的值
-6. 若 `config.md` 缺失字段，允许 AI 自行补全
-7. 若 `task.md` 与 `config.md` 冲突，以 `task.md` 的任务目标和约束优先
-8. 默认优先最小改动，除非 `task.md` 明确允许较大调整
-9. 若用户传入 `ulw`，允许 AI 通过多轮询问收集信息，再生成 `task.md` 和 `config.md`
-10. 若用户传入 `ulw` 且未给出额外限制，默认将约束写为：仅修改 `main.typ`、`task.md`、`config.md`
-
-执行重点：
-
-- 不要跳过 `task.md`
-- 不要忽略 `config.md`
-- 不要在用户已提供配置时自行重写核心信息
-- 标题、副标题、作者、单位、日期、目录、正文、图片引用等内容，优先使用 `config.md`
-- 只有在缺省时，才允许 AI 自行填充
-- 若检测到 `ulw` 且文件不存在，先问，再写，不要直接猜完整配置
-- 若检测到 `ulw` 且用户未说明额外限制，不要追问“约束”，直接使用默认约束生成 `task.md`
-
-最简工作流如下：
-
-```md
-用户：
-1. 写 `task.md`
-2. 写 `config.md`
-3. 让 AI 在当前目录下执行任务
-
-AI：
-1. 读取 `task.md`
-2. 读取 `config.md`
-3. 按任务要求完成代码或内容修改
-4. 优先使用配置，缺省部分再自行补全
-```
-
-如果用户传入 `ulw`，则改为：
-
-```md
-用户：
-1. 传入 `ulw`
-2. 按 AI 的问题逐步补充信息
-
-AI：
-1. 询问目标、背景、验收标准
-2. 使用默认约束写入 `task.md`
-3. 逐步询问配置项信息
-4. 生成 `task.md`
-5. 生成 `config.md`
-6. 再执行后续代码或内容工作
-```

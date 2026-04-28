@@ -2,6 +2,8 @@
 #import "../shared/base.typ": page-background, page-footer, palette
 
 #let cover-slide(
+  logo: none,
+  logo-gap: 0.8em,
   title: none,
   subtitle: none,
   author: none,
@@ -39,6 +41,10 @@
     align(center + horizon)[
       #block(width: content-width, inset: content-inset)[
         #set align(center + horizon)
+        #if logo != none [
+          #logo
+          #v(logo-gap)
+        ]
         #text(size: title-size, weight: "bold", fill: title-fill)[#title]
         #if subtitle != none [
           #v(subtitle-gap)
